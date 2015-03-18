@@ -22,5 +22,11 @@ $(call inherit-product, device/lge/w7/device_w7.mk)
 PRODUCT_DEVICE := w7
 PRODUCT_NAME := full_w7
 PRODUCT_BRAND := lge
-PRODUCT_MODEL := w7
+ifneq ($(TARGET_BOARD_MODEL),)
+    PRODUCT_MODEL := $(TARGET_BOARD_MODEL)
+else
+    PRODUCT_MODEL := LG-D415
+endif
 PRODUCT_MANUFACTURER := LGE
+
+

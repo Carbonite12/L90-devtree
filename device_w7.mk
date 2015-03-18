@@ -44,11 +44,14 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.telephony.gsm.xml:system/etc/permissions/android.hardware.telephony.gsm.xml \
     frameworks/native/data/etc/android.hardware.telephony.cdma.xml:system/etc/permissions/android.hardware.telephony.cdma.xml \
     frameworks/native/data/etc/android.hardware.audio.low_latency.xml:system/etc/permissions/android.hardware.audio.low_latency.xml \
-    frameworks/native/data/etc/android.hardware.bluetooth_le.xml:system/etc/permissions/android.hardware.bluetooth_le.xml \
-    frameworks/native/data/etc/android.hardware.nfc.xml:system/etc/permissions/android.hardware.nfc.xml \
-    frameworks/native/data/etc/android.hardware.nfc.hce.xml:system/etc/permissions/android.hardware.nfc.hce.xml \
-    frameworks/native/data/etc/com.android.nfc_extras.xml:system/etc/permissions/com.android.nfc_extras.xml \
     device/lge/w7/prebuilt/etc/permissions/com.qualcomm.location.xml:system/etc/permissions/com.qualcomm.location.xml
+ifeq ($(TARGET_KERNEL_HAS_NFC),y)
+    PRODUCT_COPY_FILES += \
+        frameworks/native/data/etc/android.hardware.nfc.xml:system/etc/permissions/android.hardware.nfc.xml \
+        frameworks/native/data/etc/android.hardware.nfc.hce.xml:system/etc/permissions/android.hardware.nfc.hce.xml \
+        frameworks/native/data/etc/com.android.nfc_extras.xml:system/etc/permissions/com.android.nfc_extras.xml
+endif
+    
 
 # Configs
 PRODUCT_COPY_FILES += \
@@ -64,19 +67,17 @@ PRODUCT_COPY_FILES += \
     device/lge/w7/prebuilt/etc/hostapd/hostapd_default.conf:system/etc/hostapd/hostapd_default.conf \
     device/lge/w7/prebuilt/etc/audio_policy.conf:system/etc/audio_policy.conf \
     device/lge/w7/prebuilt/etc/audio_effects.conf:system/etc/audio_effects.conf \
+    device/lge/w7/prebuilt/usr/keylayout/gpio-keys.kl:system/usr/keylayout/gpio-keys.kl \
     device/lge/w7/prebuilt/etc/media_codecs.xml:system/etc/media_codecs.xml \
     device/lge/w7/prebuilt/etc/media_profiles.xml:system/etc/media_profiles.xml \
     device/lge/w7/prebuilt/etc/mixer_paths.xml:system/etc/mixer_paths.xml \
     device/lge/w7/prebuilt/etc/thermal-engine-8226.conf:system/etc/thermal-engine-8226.conf \
     device/lge/w7/prebuilt/usr/idc/touch_dev.idc:system/usr/idc/touch_dev.idc \
-    device/lge/w7/prebuilt/usr/keylayout/gpio-keys_d415.kl:system/usr/keylayout/gpio-keys_d415.kl \
-    device/lge/w7/prebuilt/usr/keylayout/gpio-keys_d410.kl:system/usr/keylayout/gpio-keys_d410.kl \
     device/lge/w7/prebuilt/etc/init.zetaw.fm.sh:system/etc/init.zetaw.fm.sh \
     device/lge/w7/prebuilt/etc/init.zetaw.ssr.wifi.sh:system/etc/init.zetaw.ssr.wifi.sh \
     device/lge/w7/prebuilt/etc/init.zetaw.wifi.sh:system/etc/init.zetaw.wifi.sh \
     device/lge/w7/prebuilt/etc/init.crda.sh:system/etc/init.crda.sh \
     device/lge/w7/prebuilt/etc/init.zetaw.post_boot.sh:system/etc/init.zetaw.post_boot.sh \
-    device/lge/w7/prebuilt/etc/init.zetaw.bt.sh:system/etc/init.zetaw.bt.sh \
     device/lge/w7/prebuilt/etc/sap.conf:system/etc/sap.conf \
     device/lge/w7/prebuilt/etc/gps.conf:system/etc/gps.conf \
     device/lge/w7/prebuilt/etc/msap.conf:system/etc/msap.conf \
@@ -84,13 +85,16 @@ PRODUCT_COPY_FILES += \
     device/lge/w7/prebuilt/etc/sec_config:system/etc/sec_config \
     device/lge/w7/prebuilt/etc/izat.conf:system/etc/izat.conf \
     device/lge/w7/prebuilt/etc/boot_fixup:system/etc/boot_fixup \
+    device/lge/w7/prebuilt/etc/quipc.conf:system/etc/quipc.conf
+    
+ifeq ($(TARGET_USE_NFC),y)
+PRODUCT_COPY_FILES += \
     device/lge/w7/prebuilt/etc/libnfc-brcm.conf:system/etc/libnfc-brcm.conf \
     device/lge/w7/prebuilt/etc/nfc-nci.conf:system/etc/nfc-nci.conf \
     device/lge/w7/prebuilt/etc/libnfc-nxp.conf:system/etc/libnfc-nxp.conf \
     device/lge/w7/prebuilt/etc/nfcee_access.xml:system/etc/nfcee_access.xml \
-    device/lge/w7/prebuilt/etc/quipc.conf:system/etc/quipc.conf \
-    device/lge/w7/prebuilt/etc/init.d/10nfc_checker:system/etc/init.d/10nfc_checker \
-    device/lge/w7/prebuilt/etc/init.d/11keys_checker:system/etc/init.d/11keys_checker
+    device/lge/w7/prebuilt/etc/init.d/10nfc_checker:system/etc/init.d/10nfc_checker
+endif
 
 # Ramdisk
 PRODUCT_COPY_FILES += \
@@ -126,6 +130,7 @@ PRODUCT_COPY_FILES += \
 
 # Audio
 PRODUCT_PACKAGES += \
+    audio.primary.msm8226 \
     audio_policy.msm8226 \
     audio.a2dp.default \
     audio.usb.default \
@@ -135,6 +140,9 @@ PRODUCT_PACKAGES += \
     libqcomvisualizer \
     libqcompostprocbundle \
     libqcomvoiceprocessing \
+    libaudioroute \
+    libtinyalsa \
+    libtinycompress \
     tinycap \
     tinymix \
     tinypcminfo \
@@ -183,13 +191,14 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     p2p_supplicant_overlay.conf \
     wpa_supplicant_overlay.conf \
+    libwpa_client \
+    hostapd \
+    wpa_supplicant \
+    wpa_supplicant.conf \
     libwcnss_qmi \
 
 # Charger
 PRODUCT_PACKAGES += charger charger_res_images
-
-# QRNGD
-PRODUCT_PACKAGES += qrngd
 
 # Ebtables
 PRODUCT_PACKAGES += \
@@ -198,11 +207,13 @@ PRODUCT_PACKAGES += \
     libebtc
 
 # FM radio
+ifeq ($(BOARD_HAVE_QCOM_FM),true)
 PRODUCT_PACKAGES += \
     qcom.fmradio \
     libqcomfm_jni \
     FM2 \
     FMRecord
+endif
 
 # GPS
 PRODUCT_PACKAGES += \
@@ -281,7 +292,7 @@ PRODUCT_PACKAGES += \
     hostapd.accept \
     hostapd.deny \
     hostapd_default.conf \
-    libnetcmdiface
+    libnetcmdiface.so
 
 # QCOM
 PRODUCT_PROPERTY_OVERRIDES += \
@@ -302,12 +313,17 @@ PRODUCT_PROPERTY_OVERRIDES += \
     ro.bluetooth.request.master=true \
     ro.bluetooth.remote.autoconnect=true
 
+# LG IR
+PRODUCT_PROPERTY_OVERRIDES += \
+    persist.sys.lge.eula_agreement=true
+    
 # Media
 PRODUCT_PROPERTY_OVERRIDES += \
     lpa.decode=true \
     qcom.hw.aac.encoder=true \
     af.resampler.quality=255 \
-    persist.audio.lowlatency.rec=false
+    persist.audio.lowlatency.rec=false \
+    persist.sys.media.use-awesome=true
 
 # WiFi
 PRODUCT_PROPERTY_OVERRIDES += \
@@ -363,6 +379,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
     persist.call_recording.enabled=1
 
 # NFC packages
+ifeq ($(TARGET_USE_NFC),y)
 PRODUCT_PACKAGES += \
     NfcNci \
     Tag \
@@ -370,6 +387,7 @@ PRODUCT_PACKAGES += \
     com.android.nfc_extras
 
 NFCEE_ACCESS_PATH := device/lge/w7/prebuilt/etc/nfcee_access.xml
+endif
 
 # QC time services
 PRODUCT_PROPERTY_OVERRIDES += \
@@ -379,12 +397,16 @@ PRODUCT_PROPERTY_OVERRIDES += \
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.ksm.default=1
 
-PRODUCT_BUILD_PROP_OVERRIDES += BUILD_UTC_DATE=0
+# CmUpdater
+#PRODUCT_PROPERTY_OVERRIDES += \
+#    cm.updater.uri=http://api.shinobisoft.x10.mx/api \
+
+PRODUCT_BUILD_PROP_OVERRIDES += BUILD_UTC_DATE=-5
 
 PRODUCT_LOCALES := en_US
-PRODUCT_LOCALES += hdpi
-PRODUCT_AAPT_CONFIG := normal hdpi
-PRODUCT_AAPT_PREF_CONFIG := hdpi
+PRODUCT_LOCALES += xhdpi
+PRODUCT_AAPT_CONFIG := normal xhdpi
+PRODUCT_AAPT_PREF_CONFIG := xhdpi
 
 $(call inherit-product, vendor/lge/w7/w7-vendor.mk)
 
